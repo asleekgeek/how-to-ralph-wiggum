@@ -14,7 +14,47 @@ Run on dedicated VMs or local Docker sandboxes. Restrict network connectivity, p
 
 ## Options
 
-### 1. E2B
+### Sprites (Fly.io)
+
+- persistent Linux environments that survive between executions
+- Firecracker VM isolation with up to 8 CPUs and 16GB RAM
+- fast checkpoint/restore (~300ms create, <1s restore)
+- auto-sleep when idle reduces costs significantly
+- unique HTTPS URL per Sprite for webhooks, APIs, public access
+- Layer 3 network policies for egress control (whitelist domains)
+- CLI, REST API, JavaScript SDK, Go SDK
+
+_Philosophy:_ Sprites treat sandboxes as "actual computers" rather than disposable containers. Data, packages, and services persist across executions on ext4 storage—no need to rebuild environments repeatedly.
+
+_Unique Features:_
+
+- _Stateful persistence_: Files, packages, databases survive between runs
+- _Transactional snapshots_: Version control for entire OS, not just code
+- _Idle cost optimization_: Auto-sleep when inactive, resume on request
+- _Cold start_: Under 1 second
+
+_Pricing:_
+
+- CPU: $0.07/CPU-hour (minimum 6.25% utilization)
+- Memory: $0.04375/GB-hour (minimum 250MB)
+- Storage: $0.00068/GB-hour (actual blocks only)
+- Example: 4-hour coding session ~$0.46, web app with 30 active hours ~$4/month
+
+_Specs:_
+
+- Firecracker microVM isolation (<1s cold start)
+- Timeout: None (persistent, auto-sleeps when idle)
+- 100GB initial storage capacity
+- Full Linux filesystem with persistence
+
+_Links:_
+
+- https://sprites.dev/
+- https://fly.io/blog/code-and-let-live/
+
+---
+
+### E2B
 
 - purpose-built for AI agents and LLM workflows
 - pre-built template `anthropic-claude-code` ships with Claude Code CLI ready
@@ -45,7 +85,7 @@ _Links:_
 
 ---
 
-### 2. Modal
+### Modal
 
 _Pricing:_
 
@@ -67,7 +107,7 @@ _Links:_
 
 ---
 
-### 3. Cloudflare Sandboxes
+### Cloudflare Sandboxes
 
 - in beta
 - best if already in Cloudflare ecosystem
@@ -82,6 +122,7 @@ _Limitations:_
 
 _Links:_
 
+- https://sandbox.cloudflare.com/
 - https://developers.cloudflare.com/sandbox/
 - https://developers.cloudflare.com/containers/pricing/
 
@@ -89,17 +130,18 @@ _Links:_
 
 ## Comparison Table
 
-| Feature          | E2B                 | Modal            | Cloudflare       |
-| ---------------- | ------------------- | ---------------- | ---------------- |
-| Setup            | Very Easy           | Easy             | Easy             |
-| Free Tier        | $100 credit         | $30/month        | Workers Standard |
-| Isolation        | Firecracker microVM | gVisor container | Container        |
-| Cold Start       | ~150ms              | 2-5 seconds      | Sub-second       |
-| Max Timeout      | 24 hours (Pro)      | 24 hours         | Configurable     |
-| Claude CLI       | Prebuilt template   | Manual           | Manual           |
-| Git Support      | Yes                 | Yes              | Yes              |
-| Persistent Files | 24 hours            | Via Volumes      | No               |
-| Best For         | AI agent loops      | ML workloads     | Edge apps        |
+| Feature          | Sprites              | E2B                 | Modal            | Cloudflare       |
+| ---------------- | -------------------- | ------------------- | ---------------- | ---------------- |
+| Setup            | Easy                 | Very Easy           | Easy             | Easy             |
+| Free Tier        | None (pay-as-you-go) | $100 credit         | $30/month        | Workers Standard |
+| Isolation        | Firecracker microVM  | Firecracker microVM | gVisor container | Container        |
+| Cold Start       | <1 second            | ~150ms              | 2-5 seconds      | Sub-second       |
+| Max Timeout      | None (persistent)    | 24 hours (Pro)      | 24 hours         | Configurable     |
+| Claude CLI       | Manual               | Prebuilt template   | Manual           | Manual           |
+| Git Support      | Yes                  | Yes                 | Yes              | Yes              |
+| Persistent Files | Yes (permanent)      | 24 hours            | Via Volumes      | No               |
+| Checkpoints      | Yes (~300ms)         | No                  | No               | No               |
+| Best For         | Long-running agents  | AI agent loops      | ML workloads     | Edge apps        |
 
 ---
 
@@ -112,12 +154,6 @@ _Links:_
 - Python/TypeScript SDK
 - Good E2B alternative
 - https://www.daytona.io/
-
-### Fly.io (Sprites)
-
-- Firecracker VM isolation
-- 60-second timeout limit (restrictive for Ralph)
-- Better for short-lived tasks
 
 ### Google Cloud Run
 
